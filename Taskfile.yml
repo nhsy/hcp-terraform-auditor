@@ -1,0 +1,55 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  install:
+    desc: Install all dependencies and pre-commit hooks
+    cmds:
+      - uv sync --group dev
+      - uv run pre-commit install
+
+  lint:
+    desc: Run ruff linter and format check
+    cmds:
+      - uv run ruff check src tests
+      - uv run ruff format --check src tests
+
+  pre-commit:
+    desc: Run all pre-commit hooks against all files
+    cmds:
+      - uv run pre-commit run --all-files
+
+  lint:fix:
+    desc: Run ruff linter with auto-fix
+    cmds:
+      - uv run ruff check --fix src tests
+
+  format:
+    desc: Format code with ruff
+    cmds:
+      - uv run ruff format src tests
+
+  format:check:
+    desc: Check formatting without making changes
+    cmds:
+      - uv run ruff format --check src tests
+
+  test:
+    desc: Run test suite
+    cmds:
+      - uv run python -m pytest
+
+  test:cov:
+    desc: Run test suite with coverage report
+    cmds:
+      - uv run python -m pytest --cov=hcp_tf_audit --cov-report=term-missing
+
+  run:
+    desc: Run the auditor CLI (pass args via CLI_ARGS)
+    cmds:
+      - uv run hcp-audit {{.CLI_ARGS}}
+
+  check:
+    desc: Run lint and tests
+    deps: [lint, test]
